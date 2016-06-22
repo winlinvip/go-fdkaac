@@ -19,30 +19,8 @@ cd fdk-aac/ && bash autogen.sh && ./configure --prefix=`pwd`/objs && make && mak
 cd ..
 ```
 
-Done, use the `go-fdkaac/dec`:
+Done, for example:
 
-```
-package main
-
-import (
-	"fmt"
-	"github.com/winlinvip/go-fdkaac/dec"
-)
-
-func main() {
-	fmt.Println("AAC to PCM")
-
-	d := dec.NewAacDecoder()
-
-	asc := []byte{0x12, 0x10}
-	if err := d.InitAdts(asc); err != nil {
-		fmt.Println("init adts aac decoder failed, err is", err)
-		return
-	}
-
-	fmt.Println("SampleRate:", d.SampleRate())
-	fmt.Println("AacSampleRate:", d.AacSampleRate())
-}
-```
+*. [aac decoder](blob/master/dec/example_test.go)
 
 Winlin 2016
