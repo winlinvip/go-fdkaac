@@ -21,6 +21,6 @@ cd ..
 
 Done, import and use the package:
 
-*. [aac decoder](dec/example_test.go), decode the aac frame to PCM samples.
+* [aac decoder](dec/example_test.go), decode the aac frame to PCM samples.
 
 Winlin 2016
