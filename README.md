@@ -23,4 +23,10 @@ Done, import and use the package:
 
 * [aac decoder](dec/example_test.go), decode the aac frame to PCM samples.
 
+To run all examples:
+
+```
+cd $GOPATH/src/github.com/winlinvip/go-fdkaac && go test ./...
+```
+
 Winlin 2016
