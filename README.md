@@ -19,8 +19,8 @@ cd fdk-aac/ && bash autogen.sh && ./configure --prefix=`pwd`/objs && make && mak
 cd ..
 ```
 
-Done, for example:
+Done, import and use the package:
 
-*. [aac decoder](blob/master/dec/example_test.go)
+*. [aac decoder](dec/example_test.go), decode the aac frame to PCM samples.
 
 Winlin 2016
