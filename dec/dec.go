@@ -94,6 +94,10 @@ static int aacdec_fill(aacdec_t* h, char* data, int nb_data, int* pnb_left) {
 	return 0;
 }
 
+static int aacdec_sample_bits(aacdec_t* h) {
+	return h->sample_bits;
+}
+
 static int aacdec_pcm_size(aacdec_t* h) {
 	if (!h->info) {
 		return 0;
@@ -351,6 +355,11 @@ func (v *AacDecoder) Decode(frame []byte) (pcm []byte, err error) {
 	}
 
 	return pcm[0:int(validSize)],nil
+}
+
+// The bits of a sample, the fdk aac always use 16bits sample.
+func (v *AacDecoder) SampleBits() int {
+	return int(C.aacdec_sample_bits(&v.m))
 }
 
 // The samplerate in Hz of the fully decoded PCM audio signal (after SBR processing).

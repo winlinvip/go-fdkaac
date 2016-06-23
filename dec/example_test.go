@@ -67,6 +67,7 @@ func ExampleAacDecoder_RAW() {
 	fmt.Println("NumBadBytes:", d.NumBadBytes())
 	fmt.Println("NumTotalAccessUnits:", d.NumTotalAccessUnits())
 	fmt.Println("NumBadAccessUnits:", d.NumBadAccessUnits())
+	fmt.Println("SampleBits:", d.SampleBits())
 	fmt.Println("PCM:", len(pcm))
 
 	// Output:
@@ -87,6 +88,7 @@ func ExampleAacDecoder_RAW() {
 	// NumBadBytes: 0
 	// NumTotalAccessUnits: 1
 	// NumBadAccessUnits: 0
+	// SampleBits: 16
 	// PCM: 4096
 }
 
@@ -129,6 +131,7 @@ func ExampleAacDecoder_ADTS() {
 	fmt.Println("NumBadBytes:", d.NumBadBytes())
 	fmt.Println("NumTotalAccessUnits:", d.NumTotalAccessUnits())
 	fmt.Println("NumBadAccessUnits:", d.NumBadAccessUnits())
+	fmt.Println("SampleBits:", d.SampleBits())
 	fmt.Println("PCM:", len(pcm))
 
 	// Output:
@@ -149,6 +152,7 @@ func ExampleAacDecoder_ADTS() {
 	// NumBadBytes: 0
 	// NumTotalAccessUnits: 1
 	// NumBadAccessUnits: 0
+	// SampleBits: 16
 	// PCM: 4096
 }
 
@@ -204,6 +208,7 @@ func ExampleAacDecoder_ADTS_Stream_NotEnoughBits() {
 	fmt.Println("NumBadBytes:", d.NumBadBytes())
 	fmt.Println("NumTotalAccessUnits:", d.NumTotalAccessUnits())
 	fmt.Println("NumBadAccessUnits:", d.NumBadAccessUnits())
+	fmt.Println("SampleBits:", d.SampleBits())
 	fmt.Println("PCM:", len(pcm))
 
 	// Output:
@@ -224,6 +229,7 @@ func ExampleAacDecoder_ADTS_Stream_NotEnoughBits() {
 	// NumBadBytes: 0
 	// NumTotalAccessUnits: 1
 	// NumBadAccessUnits: 0
+	// SampleBits: 16
 	// PCM: 4096
 }
 
@@ -280,6 +286,7 @@ func ExampleAacDecoder_ADTS_Frames() {
 	fmt.Println("NumBadBytes:", d.NumBadBytes())
 	fmt.Println("NumTotalAccessUnits:", d.NumTotalAccessUnits())
 	fmt.Println("NumBadAccessUnits:", d.NumBadAccessUnits())
+	fmt.Println("SampleBits:", d.SampleBits())
 	fmt.Println("PCM0:", len(pcm0))
 	fmt.Println("PCM1:", len(pcm1))
 
@@ -301,6 +308,7 @@ func ExampleAacDecoder_ADTS_Frames() {
 	// NumBadBytes: 0
 	// NumTotalAccessUnits: 2
 	// NumBadAccessUnits: 0
+	// SampleBits: 16
 	// PCM0: 4096
 	// PCM1: 4096
 }
