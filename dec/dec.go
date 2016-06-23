@@ -30,13 +30,33 @@ package dec
 typedef struct {
 	HANDLE_AACDECODER dec;
 	CStreamInfo* info;
+	int sample_bits;
 } aacdec_t;
 
-static int aacdec_init_adts(aacdec_t* h, char* asc, int nb_asc) {
+static void _aacdec_init(aacdec_t* h) {
+	// For lib-fdkaac, always use 16bits sample.
+	// avctx->sample_fmt = AV_SAMPLE_FMT_S16;
+	h->sample_bits = 16;
+
 	h->dec = NULL;
 	h->info = NULL;
+}
+
+static int aacdec_init_adts(aacdec_t* h) {
+	_aacdec_init(h);
 
 	h->dec = aacDecoder_Open(TT_MP4_ADTS, 1);
+	if (!h->dec) {
+		return -1;
+	}
+
+	return 0;
+}
+
+static int aacdec_init_raw(aacdec_t* h, char* asc, int nb_asc) {
+	_aacdec_init(h);
+
+	h->dec = aacDecoder_Open(TT_MP4_RAW, 1);
 	if (!h->dec) {
 		return -1;
 	}
@@ -47,8 +67,6 @@ static int aacdec_init_adts(aacdec_t* h, char* asc, int nb_asc) {
 	if (err != AAC_DEC_OK) {
 		return err;
 	}
-
-	h->info = aacDecoder_GetStreamInfo(h->dec);
 
 	return 0;
 }
@@ -63,7 +81,7 @@ static void aacdec_close(aacdec_t* h) {
 static int aacdec_fill(aacdec_t* h, char* data, int nb_data, int* pnb_left) {
 	UCHAR* udata = (UCHAR*)data;
 	UINT unb_data = (UINT)nb_data;
-	UINT unb_left = 0;
+	UINT unb_left = unb_data;
 	AAC_DECODER_ERROR err = aacDecoder_Fill(h->dec, &udata, &unb_data, &unb_left);
 	if (err != AAC_DEC_OK) {
 		return err;
@@ -76,71 +94,155 @@ static int aacdec_fill(aacdec_t* h, char* data, int nb_data, int* pnb_left) {
 	return 0;
 }
 
+static int aacdec_pcm_size(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
+	return (int)(h->info->numChannels * h->info->frameSize * h->sample_bits / 8);
+}
+
+static int aacdec_decode_frame(aacdec_t* h, char* pcm, int nb_pcm, int* pnb_valid) {
+	INT_PCM* upcm = (INT_PCM*)pcm;
+	INT unb_pcm = (INT)nb_pcm;
+	AAC_DECODER_ERROR err = aacDecoder_DecodeFrame(h->dec, upcm, unb_pcm, 0);
+
+	// user should fill more bytes then decode.
+	if (err == AAC_DEC_NOT_ENOUGH_BITS) {
+		return err;
+	}
+	if (err != AAC_DEC_OK) {
+		return err;
+	}
+
+	// when decode ok, retrieve the info.
+	if (!h->info) {
+		h->info = aacDecoder_GetStreamInfo(h->dec);
+	}
+
+	// the actual size of pcm.
+	if (pnb_valid) {
+		*pnb_valid = aacdec_pcm_size(h);
+	}
+
+	return 0;
+}
+
 static int aacdec_sample_rate(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->sampleRate;
 }
 
 static int aacdec_frame_size(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->frameSize;
 }
 
 static int aacdec_num_channels(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->numChannels;
 }
 
 static int aacdec_aac_sample_rate(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->aacSampleRate;
 }
 
 static int aacdec_profile(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->profile;
 }
 
 static int aacdec_audio_object_type(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->aot;
 }
 
 static int aacdec_channel_config(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->channelConfig;
 }
 
 static int aacdec_bitrate(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->bitRate;
 }
 
 static int aacdec_aac_samples_per_frame(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->aacSamplesPerFrame;
 }
 
 static int aacdec_aac_num_channels(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->aacNumChannels;
 }
 
 static int aacdec_extension_audio_object_type(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->extAot;
 }
 
 static int aacdec_extension_sampling_rate(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->extSamplingRate;
 }
 
 static int aacdec_num_lost_access_units(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->numLostAccessUnits;
 }
 
 static int aacdec_num_total_bytes(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->numTotalBytes;
 }
 
 static int aacdec_num_bad_bytes(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->numBadBytes;
 }
 
 static int aacdec_num_total_access_units(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->numTotalAccessUnits;
 }
 
 static int aacdec_num_bad_access_units(aacdec_t* h) {
+	if (!h->info) {
+		return 0;
+	}
 	return h->info->numBadAccessUnits;
 }
 */
@@ -149,7 +251,10 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
-	"bytes"
+)
+
+const (
+	aacDecNotEnoughBits = 0x1002
 )
 
 type AacDecoder struct {
@@ -160,18 +265,31 @@ func NewAacDecoder() *AacDecoder {
 	return &AacDecoder{}
 }
 
-// Explicitly configure the decoder by passing a raw AudioSpecificConfig (ASC)
-// contained in a binary buffer. This is required for MPEG-4 and Raw Packets file format bitstreams
-// as well as for LATM bitstreams with no in-band SMC. If the transport format is LATM with or without
-// LOAS, configuration is assumed to be an SMC, for all other file formats an ASC.
-func (v *AacDecoder) InitAdts(asc []byte) (err error) {
+// Open the decoder in RAW mode with ASC.
+// For example, the FLV audio payload is a SequenceHeader(ASC) or RAW AAC data,
+// user can init the decoder with ASC and decode the raw data.
+// @remark user should never get the info util decode one frame.
+func (v *AacDecoder) InitRaw(asc []byte) (err error) {
 	p := (*C.char)(unsafe.Pointer(&asc[0]))
 	pSize := C.int(len(asc))
 
-	r := C.aacdec_init_adts(&v.m, p, pSize)
+	r := C.aacdec_init_raw(&v.m, p, pSize)
 
 	if int(r) != 0 {
-		return fmt.Errorf("init aac decoder failed, code is %d", int(r))
+		return fmt.Errorf("init RAW decoder failed, code is %d", int(r))
+	}
+
+	return nil
+}
+
+// Open the decoder in ADTS mode without ASC,
+// we never know the stream info util got the first frame,
+// because the codec info is insert at begin of each frame.
+func (v *AacDecoder) InitAdts() (err error) {
+	r := C.aacdec_init_adts(&v.m)
+
+	if int(r) != 0 {
+		return fmt.Errorf("init ADTS decoder failed, code is %d", int(r))
 	}
 
 	return nil
@@ -182,16 +300,11 @@ func (v *AacDecoder) Close() {
 	C.aacdec_close(&v.m)
 }
 
-// Fill AAC decoder's internal input buffer with bitstream data from the external input buffer.
-// The function only copies such data as long as the decoder-internal input buffer is not full.
-// So it grabs whatever it can from pBuffer and returns information (bytesValid) so that at a
-// subsequent call of Fill(), the right position in pBuffer can be determined to
-// grab the next data.
-// @remark we will consume the input buffer and there maybe left bytes in buffer to parsed next time.
-func (v *AacDecoder) Fill(input *bytes.Buffer) (err error) {
-	b := input.Bytes()
-	p := (*C.char)(unsafe.Pointer(&b[0]))
-	pSize := C.int(input.Len())
+// Fill the buffer of decoder then decode.
+// @remark we always expect all input are consumed by decoder.
+func (v *AacDecoder) fill(input []byte) (err error) {
+	p := (*C.char)(unsafe.Pointer(&input[0]))
+	pSize := C.int(len(input))
 	leftSize := C.int(0)
 
 	r := C.aacdec_fill(&v.m, p, pSize, &leftSize)
@@ -200,11 +313,44 @@ func (v *AacDecoder) Fill(input *bytes.Buffer) (err error) {
 		return fmt.Errorf("fill aac decoder failed, code is %d", int(r))
 	}
 
-	if int(leftSize) >= 0 {
-		input.Next(input.Len() - int(leftSize))
+	if int(leftSize) > 0 {
+		return fmt.Errorf("decoder left %v bytes", int(leftSize))
 	}
 
 	return
+}
+
+// Decode one audio frame.
+// @param the frame contains encoded aac frame, optional can be nil.
+// @eturn when pcm is nil, should fill more bytes and decode again.
+func (v *AacDecoder) Decode(frame []byte) (pcm []byte, err error) {
+	if len(frame) > 0 {
+		if err = v.fill(frame); err != nil {
+			return
+		}
+	}
+
+	nbPcm := int(C.aacdec_pcm_size(&v.m))
+	if nbPcm == 0 {
+		nbPcm = 50 * 1024
+	}
+	pcm = make([]byte, nbPcm, nbPcm)
+
+	p := (*C.char)(unsafe.Pointer(&pcm[0]))
+	pSize := C.int(nbPcm)
+	validSize := C.int(0)
+
+	r := C.aacdec_decode_frame(&v.m, p, pSize, &validSize)
+
+	if int(r) == aacDecNotEnoughBits {
+		return nil, nil
+	}
+
+	if int(r) != 0 {
+		return nil, fmt.Errorf("decode frame failed, code is %d", int(r))
+	}
+
+	return pcm[0:int(validSize)],nil
 }
 
 // The samplerate in Hz of the fully decoded PCM audio signal (after SBR processing).
