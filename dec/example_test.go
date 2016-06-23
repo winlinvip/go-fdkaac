@@ -34,10 +34,30 @@ func ExampleAacDecoder_ADTS() {
 		return
 	}
 
-	fmt.Println("SampleRate:", d.SampleRate())
-	fmt.Println("AacSampleRate:", d.AacSampleRate())
+	fmt.Println("\nInitAdts:")
+	fmt.Println(fmt.Sprintf("AacSampleRate=%v, Profile=%v, AudioObjectType=%v, ChannelConfig=%v, SamplePerFrame=%v",
+		d.AacSampleRate(), d.Profile(), d.AudioObjectType(), d.ChannelConfig(), d.SamplesPerFrame()))
+
+	fmt.Println("\nFinal:")
+	fmt.Println(fmt.Sprintf("SampleRate=%v, FrameSize=%v, NumChannels=%v, AacSampleRate=%v,",
+		d.SampleRate(), d.FrameSize(), d.NumChannels(), d.AacSampleRate()))
+	fmt.Println(fmt.Sprintf("Profile=%v, AudioObjectType=%v, ChannelConfig=%v, Bitrate=%v, SamplesPerFrame=%v,",
+		d.Profile(), d.AudioObjectType(), d.ChannelConfig(), d.Bitrate(), d.SamplesPerFrame()))
+	fmt.Println(fmt.Sprintf("AacNumChannels=%v, ExtensionAudioObjectType=%v, ExtensionSamplingRate=%v,",
+		d.AacNumChannels(), d.ExtensionAudioObjectType(), d.ExtensionSamplingRate()))
+	fmt.Println(fmt.Sprintf("NumLostAccessUnits=%v, NumTotalBytes=%v, NumBadBytes=%v, NumTotalAccessUnits=%v,",
+		d.NumLostAccessUnits(), d.NumTotalBytes(), d.NumBadBytes(), d.NumTotalAccessUnits()))
+	fmt.Println(fmt.Sprintf("NumBadAccessUnits=%v", d.NumBadAccessUnits()))
 
 	// Output:
-	// SampleRate: 0
-	// AacSampleRate: 44100
+	//
+	// InitAdts:
+	// AacSampleRate=44100, Profile=1, AudioObjectType=2, ChannelConfig=2, SamplePerFrame=1024
+	//
+	// Final:
+	// SampleRate=0, FrameSize=0, NumChannels=0, AacSampleRate=44100,
+	// Profile=1, AudioObjectType=2, ChannelConfig=2, Bitrate=0, SamplesPerFrame=1024,
+	// AacNumChannels=0, ExtensionAudioObjectType=0, ExtensionSamplingRate=0,
+	// NumLostAccessUnits=0, NumTotalBytes=0, NumBadBytes=0, NumTotalAccessUnits=0,
+	// NumBadAccessUnits=0
 }

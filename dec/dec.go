@@ -54,8 +54,68 @@ static int aacdec_sample_rate(aacdec_t* h) {
 	return h->info->sampleRate;
 }
 
+static int aacdec_frame_size(aacdec_t* h) {
+	return h->info->frameSize;
+}
+
+static int aacdec_num_channels(aacdec_t* h) {
+	return h->info->numChannels;
+}
+
 static int aacdec_aac_sample_rate(aacdec_t* h) {
 	return h->info->aacSampleRate;
+}
+
+static int aacdec_profile(aacdec_t* h) {
+	return h->info->profile;
+}
+
+static int aacdec_audio_object_type(aacdec_t* h) {
+	return h->info->aot;
+}
+
+static int aacdec_channel_config(aacdec_t* h) {
+	return h->info->channelConfig;
+}
+
+static int aacdec_bitrate(aacdec_t* h) {
+	return h->info->bitRate;
+}
+
+static int aacdec_samples_per_frame(aacdec_t* h) {
+	return h->info->aacSamplesPerFrame;
+}
+
+static int aacdec_aac_num_channels(aacdec_t* h) {
+	return h->info->aacNumChannels;
+}
+
+static int aacdec_extension_audio_object_type(aacdec_t* h) {
+	return h->info->extAot;
+}
+
+static int aacdec_extension_sampling_rate(aacdec_t* h) {
+	return h->info->extSamplingRate;
+}
+
+static int aacdec_num_lost_access_units(aacdec_t* h) {
+	return h->info->numLostAccessUnits;
+}
+
+static int aacdec_num_total_bytes(aacdec_t* h) {
+	return h->info->numTotalBytes;
+}
+
+static int aacdec_num_bad_bytes(aacdec_t* h) {
+	return h->info->numBadBytes;
+}
+
+static int aacdec_num_total_access_units(aacdec_t* h) {
+	return h->info->numTotalAccessUnits;
+}
+
+static int aacdec_num_bad_access_units(aacdec_t* h) {
+	return h->info->numBadAccessUnits;
 }
 */
 import "C"
@@ -86,14 +146,111 @@ func (v *AacDecoder) InitAdts(asc []byte) (err error) {
 	return nil
 }
 
-// These three members are the only really relevant ones for the user.
 // The samplerate in Hz of the fully decoded PCM audio signal (after SBR processing).
+// @remark The only really relevant ones for the user.
 func (v *AacDecoder) SampleRate() int {
 	return int(C.aacdec_sample_rate(&v.m))
 }
 
-// Decoder internal members.
+// The frame size of the decoded PCM audio signal.
+//		1024 or 960 for AAC-LC
+//		2048 or 1920 for HE-AAC (v2)
+//		512 or 480 for AAC-LD and AAC-ELD
+// @remark The only really relevant ones for the user.
+func (v *AacDecoder) FrameSize() int {
+	return int(C.aacdec_frame_size(&v.m))
+}
+
+// The number of output audio channels in the decoded and interleaved PCM audio signal.
+// @remark The only really relevant ones for the user.
+func (v *AacDecoder) NumChannels() int {
+	return int(C.aacdec_num_channels(&v.m))
+}
+
 // sampling rate in Hz without SBR (from configuration info).
+// @remark Decoder internal members.
 func (v *AacDecoder) AacSampleRate() int {
 	return int(C.aacdec_aac_sample_rate(&v.m))
+}
+
+// MPEG-2 profile (from file header) (-1: not applicable (e. g. MPEG-4)).
+// @remark Decoder internal members.
+func (v *AacDecoder) Profile() int {
+	return int(C.aacdec_profile(&v.m))
+}
+
+// Audio Object Type (from ASC): is set to the appropriate value for MPEG-2 bitstreams (e. g. 2 for AAC-LC).
+// @remark Decoder internal members.
+func (v *AacDecoder) AudioObjectType() int {
+	return int(C.aacdec_audio_object_type(&v.m))
+}
+
+// Channel configuration (0: PCE defined, 1: mono, 2: stereo, ...
+// @remark Decoder internal members.
+func (v *AacDecoder) ChannelConfig() int {
+	return int(C.aacdec_channel_config(&v.m))
+}
+
+// Instantaneous bit rate.
+// @remark Decoder internal members.
+func (v *AacDecoder) Bitrate() int {
+	return int(C.aacdec_bitrate(&v.m))
+}
+
+// Samples per frame for the AAC core (from ASC).
+//		1024 or 960 for AAC-LC
+//		512 or 480 for AAC-LD and AAC-ELD
+// @remark Decoder internal members.
+func (v *AacDecoder) SamplesPerFrame() int {
+	return int(C.aacdec_samples_per_frame(&v.m))
+}
+
+// The number of audio channels after AAC core processing (before PS or MPS processing).
+//		CAUTION: This are not the final number of output channels!
+// @remark Decoder internal members.
+func (v *AacDecoder) AacNumChannels() int {
+	return int(C.aacdec_aac_num_channels(&v.m))
+}
+
+// Extension Audio Object Type (from ASC)
+// @remark Decoder internal members.
+func (v *AacDecoder) ExtensionAudioObjectType() int {
+	return int(C.aacdec_extension_audio_object_type(&v.m))
+}
+
+// Extension sampling rate in Hz (from ASC)
+// @remark Decoder internal members.
+func (v *AacDecoder) ExtensionSamplingRate() int {
+	return int(C.aacdec_extension_sampling_rate(&v.m))
+}
+
+// This integer will reflect the estimated amount of lost access units in case aacDecoder_DecodeFrame()
+// returns AAC_DEC_TRANSPORT_SYNC_ERROR. It will be < 0 if the estimation failed.
+// @remark Statistics.
+func (v *AacDecoder) NumLostAccessUnits() int {
+	return int(C.aacdec_num_lost_access_units(&v.m))
+}
+
+// This is the number of total bytes that have passed through the decoder.
+// @remark Statistics.
+func (v *AacDecoder) NumTotalBytes() int {
+	return int(C.aacdec_num_total_bytes(&v.m))
+}
+
+// This is the number of total bytes that were considered with errors from numTotalBytes.
+// @remark Statistics.
+func (v *AacDecoder) NumBadBytes() int {
+	return int(C.aacdec_num_bad_bytes(&v.m))
+}
+
+// This is the number of total access units that have passed through the decoder.
+// @remark Statistics.
+func (v *AacDecoder) NumTotalAccessUnits() int {
+	return int(C.aacdec_num_total_access_units(&v.m))
+}
+
+// This is the number of total access units that were considered with errors from numTotalBytes.
+// @remark Statistics.
+func (v *AacDecoder) NumBadAccessUnits() int {
+	return int(C.aacdec_num_bad_access_units(&v.m))
 }
