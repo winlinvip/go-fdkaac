@@ -33,6 +33,9 @@ typedef struct {
 } aacdec_t;
 
 static int aacdec_init_adts(aacdec_t* h, char* asc, int nb_asc) {
+	h->dec = NULL;
+	h->info = NULL;
+
 	h->dec = aacDecoder_Open(TT_MP4_ADTS, 1);
 	if (!h->dec) {
 		return -1;
@@ -46,6 +49,29 @@ static int aacdec_init_adts(aacdec_t* h, char* asc, int nb_asc) {
 	}
 
 	h->info = aacDecoder_GetStreamInfo(h->dec);
+
+	return 0;
+}
+
+static void aacdec_close(aacdec_t* h) {
+	if (h->dec) {
+		aacDecoder_Close(h->dec);
+	}
+	h->dec = NULL;
+}
+
+static int aacdec_fill(aacdec_t* h, char* data, int nb_data, int* pnb_left) {
+	UCHAR* udata = (UCHAR*)data;
+	UINT unb_data = (UINT)nb_data;
+	UINT unb_left = 0;
+	AAC_DECODER_ERROR err = aacDecoder_Fill(h->dec, &udata, &unb_data, &unb_left);
+	if (err != AAC_DEC_OK) {
+		return err;
+	}
+
+	if (pnb_left) {
+		*pnb_left = (int)unb_left;
+	}
 
 	return 0;
 }
@@ -82,7 +108,7 @@ static int aacdec_bitrate(aacdec_t* h) {
 	return h->info->bitRate;
 }
 
-static int aacdec_samples_per_frame(aacdec_t* h) {
+static int aacdec_aac_samples_per_frame(aacdec_t* h) {
 	return h->info->aacSamplesPerFrame;
 }
 
@@ -123,6 +149,7 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
+	"bytes"
 )
 
 type AacDecoder struct {
@@ -133,6 +160,10 @@ func NewAacDecoder() *AacDecoder {
 	return &AacDecoder{}
 }
 
+// Explicitly configure the decoder by passing a raw AudioSpecificConfig (ASC)
+// contained in a binary buffer. This is required for MPEG-4 and Raw Packets file format bitstreams
+// as well as for LATM bitstreams with no in-band SMC. If the transport format is LATM with or without
+// LOAS, configuration is assumed to be an SMC, for all other file formats an ASC.
 func (v *AacDecoder) InitAdts(asc []byte) (err error) {
 	p := (*C.char)(unsafe.Pointer(&asc[0]))
 	pSize := C.int(len(asc))
@@ -144,6 +175,36 @@ func (v *AacDecoder) InitAdts(asc []byte) (err error) {
 	}
 
 	return nil
+}
+
+// De-allocate all resources of an AAC decoder instance.
+func (v *AacDecoder) Close() {
+	C.aacdec_close(&v.m)
+}
+
+// Fill AAC decoder's internal input buffer with bitstream data from the external input buffer.
+// The function only copies such data as long as the decoder-internal input buffer is not full.
+// So it grabs whatever it can from pBuffer and returns information (bytesValid) so that at a
+// subsequent call of Fill(), the right position in pBuffer can be determined to
+// grab the next data.
+// @remark we will consume the input buffer and there maybe left bytes in buffer to parsed next time.
+func (v *AacDecoder) Fill(input *bytes.Buffer) (err error) {
+	b := input.Bytes()
+	p := (*C.char)(unsafe.Pointer(&b[0]))
+	pSize := C.int(input.Len())
+	leftSize := C.int(0)
+
+	r := C.aacdec_fill(&v.m, p, pSize, &leftSize)
+
+	if int(r) != 0 {
+		return fmt.Errorf("fill aac decoder failed, code is %d", int(r))
+	}
+
+	if int(leftSize) >= 0 {
+		input.Next(input.Len() - int(leftSize))
+	}
+
+	return
 }
 
 // The samplerate in Hz of the fully decoded PCM audio signal (after SBR processing).
@@ -201,8 +262,8 @@ func (v *AacDecoder) Bitrate() int {
 //		1024 or 960 for AAC-LC
 //		512 or 480 for AAC-LD and AAC-ELD
 // @remark Decoder internal members.
-func (v *AacDecoder) SamplesPerFrame() int {
-	return int(C.aacdec_samples_per_frame(&v.m))
+func (v *AacDecoder) AacSamplesPerFrame() int {
+	return int(C.aacdec_aac_samples_per_frame(&v.m))
 }
 
 // The number of audio channels after AAC core processing (before PS or MPS processing).
