@@ -36,7 +36,7 @@ typedef struct {
 	// The bits of sample, always 16 for fdkaac.
 	int sample_bits;
 	// Total filled bytes.
-	unsigned long filled_bytes;
+	UINT filled_bytes;
 } aacdec_t;
 
 static void _aacdec_init(aacdec_t* h) {
