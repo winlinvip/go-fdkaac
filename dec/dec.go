@@ -29,14 +29,22 @@ package dec
 
 typedef struct {
 	HANDLE_AACDECODER dec;
+	// Whether use ADTS mode.
+	int is_adts;
+	// Init util the first frame decoded.
 	CStreamInfo* info;
+	// The bits of sample, always 16 for fdkaac.
 	int sample_bits;
+	// Total filled bytes.
+	unsigned long filled_bytes;
 } aacdec_t;
 
 static void _aacdec_init(aacdec_t* h) {
 	// For lib-fdkaac, always use 16bits sample.
 	// avctx->sample_fmt = AV_SAMPLE_FMT_S16;
 	h->sample_bits = 16;
+	h->is_adts = 0;
+	h->filled_bytes = 0;
 
 	h->dec = NULL;
 	h->info = NULL;
@@ -44,6 +52,8 @@ static void _aacdec_init(aacdec_t* h) {
 
 static int aacdec_init_adts(aacdec_t* h) {
 	_aacdec_init(h);
+
+	h->is_adts = 1;
 
 	h->dec = aacDecoder_Open(TT_MP4_ADTS, 1);
 	if (!h->dec) {
@@ -79,6 +89,8 @@ static void aacdec_close(aacdec_t* h) {
 }
 
 static int aacdec_fill(aacdec_t* h, char* data, int nb_data, int* pnb_left) {
+	h->filled_bytes += nb_data;
+
 	UCHAR* udata = (UCHAR*)data;
 	UINT unb_data = (UINT)nb_data;
 	UINT unb_left = unb_data;
@@ -106,6 +118,12 @@ static int aacdec_pcm_size(aacdec_t* h) {
 }
 
 static int aacdec_decode_frame(aacdec_t* h, char* pcm, int nb_pcm, int* pnb_valid) {
+	// when buffer left bytes not enough, directly return not-enough-bits.
+	// we requires atleast 7bytes header for adts.
+	if (h->is_adts && h->info && h->filled_bytes - h->info->numTotalBytes <= 7) {
+		return AAC_DEC_NOT_ENOUGH_BITS;
+	}
+
 	INT_PCM* upcm = (INT_PCM*)pcm;
 	INT unb_pcm = (INT)nb_pcm;
 	AAC_DECODER_ERROR err = aacDecoder_DecodeFrame(h->dec, upcm, unb_pcm, 0);
