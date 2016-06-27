@@ -24,7 +24,7 @@ package dec
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../fdk-aac/objs/include/fdk-aac
-#cgo LDFLAGS: ${SRCDIR}/../fdk-aac/objs/lib/libfdk-aac.a
+#cgo LDFLAGS: ${SRCDIR}/../fdk-aac/objs/lib/libfdk-aac.a -lm
 #include "aacdecoder_lib.h"
 
 typedef struct {
