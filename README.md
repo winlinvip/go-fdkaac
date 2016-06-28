@@ -22,6 +22,7 @@ cd ..
 Done, import and use the package:
 
 * [aac decoder](dec/example_test.go), decode the aac frame to PCM samples.
+* [aac encoder](enc/example_test.go), encode the PCM samples to aac frame.
 
 To run all examples:
 
