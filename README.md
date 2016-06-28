@@ -24,6 +24,10 @@ Done, import and use the package:
 * [aac decoder](dec/example_test.go), decode the aac frame to PCM samples.
 * [aac encoder](enc/example_test.go), encode the PCM samples to aac frame.
 
+There are an example of AAC audio packets in ADTS:
+
+* [avatar aac over ADTS](doc/adts_data.go), user can use this file to decode to PCM then encode.
+
 To run all examples:
 
 ```
