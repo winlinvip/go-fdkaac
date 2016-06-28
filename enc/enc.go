@@ -260,7 +260,8 @@ func (v *AacEncoder) Close() {
 // @remark fdkaac always use 16bits pcm, so the bits of pcm always 16.
 // @remark user should resample the pcm to fit the encoder, so the channels of pcm equals to encoder's.
 // @remark user should resample the pcm to fit the encoder, so the sampleRate of pcm equals to encoder's.
-// @return when aac is nil, user should feed more pcm and encode again.
+// @return when aac is nil, encoded completed(the Flush() return nil also),
+//		because we will flush the encoder automatically to got the last frames.
 func (v *AacEncoder) Encode(pcm []byte, nbSamples int) (aac []byte, err error) {
 	// The maximum packet size is 8KB aka 768 bytes per channel.
 	nbAac := int(C.aacenc_max_output_buffer_size(&v.m))
@@ -279,8 +280,10 @@ func (v *AacEncoder) Encode(pcm []byte, nbSamples int) (aac []byte, err error) {
 	}
 
 	valid := int(pAacSize)
+
+	// when got nil packet, flush encoder.
 	if valid == 0 {
-		return nil, nil
+		return v.Flush()
 	}
 
 	return aac[0:valid],nil
