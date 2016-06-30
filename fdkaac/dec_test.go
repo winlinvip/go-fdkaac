@@ -20,15 +20,15 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // @remark we must use another packet for utest, because the cgo will dup symbols.
-package dec_test
+package fdkaac_test
 
 import (
 	"testing"
-	"github.com/winlinvip/go-fdkaac/dec"
+	"github.com/winlinvip/go-fdkaac/fdkaac"
 )
 
 func TestRawInit(t *testing.T) {
-	d := dec.NewAacDecoder()
+	d := fdkaac.NewAacDecoder()
 
 	asc := []byte{0x12, 0x10}
 	if err := d.InitRaw(asc); err != nil {
@@ -55,7 +55,7 @@ func TestRawInit(t *testing.T) {
 }
 
 func TestAdtsInit(t *testing.T) {
-	d := dec.NewAacDecoder()
+	d := fdkaac.NewAacDecoder()
 
 	if err := d.InitAdts(); err != nil {
 		t.Error("init failed, err is", err)
@@ -81,7 +81,7 @@ func TestAdtsInit(t *testing.T) {
 }
 
 func TestRawDecode(t *testing.T) {
-	d := dec.NewAacDecoder()
+	d := fdkaac.NewAacDecoder()
 
 	asc := []byte{0x12, 0x10}
 	if err := d.InitRaw(asc); err != nil {
@@ -106,7 +106,7 @@ func TestRawDecode(t *testing.T) {
 }
 
 func TestRawDecode_MultipleFrames(t *testing.T) {
-	d := dec.NewAacDecoder()
+	d := fdkaac.NewAacDecoder()
 
 	asc := []byte{0x12, 0x10}
 	if err := d.InitRaw(asc); err != nil {
@@ -158,7 +158,7 @@ func TestRawDecode_MultipleFrames(t *testing.T) {
 }
 
 func TestAdtsDecode_Partial(t *testing.T) {
-	d := dec.NewAacDecoder()
+	d := fdkaac.NewAacDecoder()
 
 	if err := d.InitAdts(); err != nil {
 		t.Error("init failed, err is", err)
@@ -212,7 +212,7 @@ func TestAdtsDecode_Partial(t *testing.T) {
 }
 
 func TestAdtsDecode_Partial2(t *testing.T) {
-	d := dec.NewAacDecoder()
+	d := fdkaac.NewAacDecoder()
 
 	if err := d.InitAdts(); err != nil {
 		t.Error("init failed, err is", err)
@@ -285,7 +285,7 @@ func TestAdtsDecode_Partial2(t *testing.T) {
 }
 
 func TestRawDecode_Partial(t *testing.T) {
-	d := dec.NewAacDecoder()
+	d := fdkaac.NewAacDecoder()
 
 	asc := []byte{0x12, 0x10}
 	if err := d.InitRaw(asc); err != nil {

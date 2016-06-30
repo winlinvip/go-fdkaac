@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // The aac decoder, to decode the encoded aac frame to PCM samples.
-package dec
+package fdkaac
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../fdk-aac/objs/include/fdk-aac

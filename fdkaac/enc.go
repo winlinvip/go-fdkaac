@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // The aac encoder, to encode the PCM samples to aac frame.
-package enc
+package fdkaac
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../fdk-aac/objs/include/fdk-aac
@@ -231,6 +231,7 @@ import (
 // The AAC encoder, input is PCM samples, output AAC frame in ADTS.
 type AacEncoder struct {
 	m C.aacenc_t
+	channels int
 }
 
 func NewAacEncoder() *AacEncoder {
@@ -243,6 +244,8 @@ func NewAacEncoder() *AacEncoder {
 // @remark for the fdkaac always use 16bits sample, so the bits of pcm always 16,
 //		which must be: [SHORT PCM] [SHORT PCM] ... ...
 func (v *AacEncoder) InitLc(channels, sampleRate, bitrateBps int) (err error) {
+	v.channels = channels
+
 	aot := int(2) // AOT_AAC_LC
 	r := C.aacenc_init(&v.m, C.int(aot), C.int(channels), C.int(sampleRate), C.int(bitrateBps))
 	if int(r) != 0 {
@@ -255,14 +258,19 @@ func (v *AacEncoder) Close() {
 	C.aacenc_close(&v.m)
 }
 
-// Encode the pcm to aac
-// User must specifies the nbSamples of pcm.
+// Encode the pcm to aac, pcm must contains bytes for one aac frame,
+//		that is the bytes must be 2*channels*frameSize
 // @remark fdkaac always use 16bits pcm, so the bits of pcm always 16.
 // @remark user should resample the pcm to fit the encoder, so the channels of pcm equals to encoder's.
 // @remark user should resample the pcm to fit the encoder, so the sampleRate of pcm equals to encoder's.
 // @return when aac is nil, encoded completed(the Flush() return nil also),
 //		because we will flush the encoder automatically to got the last frames.
-func (v *AacEncoder) Encode(pcm []byte, nbSamples int) (aac []byte, err error) {
+func (v *AacEncoder) Encode(pcm []byte) (aac []byte, err error) {
+	if frameBytes := 2 * v.channels * v.FrameSize(); frameBytes != len(pcm) {
+		return nil, fmt.Errorf("PCM must be one frame 2*%v*%v=%v, actual=%v",
+			v.channels, v.FrameSize(), frameBytes, len(pcm))
+	}
+
 	// The maximum packet size is 8KB aka 768 bytes per channel.
 	nbAac := int(C.aacenc_max_output_buffer_size(&v.m))
 	aac = make([]byte, nbAac)
@@ -272,7 +280,7 @@ func (v *AacEncoder) Encode(pcm []byte, nbSamples int) (aac []byte, err error) {
 
 	pPcm := (*C.char)(unsafe.Pointer(&pcm[0]))
 	pPcmSize := C.int(len(pcm))
-	pNbSamples := C.int(nbSamples)
+	pNbSamples := C.int(v.FrameSize())
 
 	r := C.aacenc_encode(&v.m, pPcm, pPcmSize, pNbSamples, pAac, &pAacSize)
 	if int(r) != 0 {
