@@ -23,8 +23,8 @@
 package fdkaac
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../fdk-aac/objs/include/fdk-aac
-#cgo LDFLAGS: ${SRCDIR}/../fdk-aac/objs/lib/libfdk-aac.a -lm
+#cgo CFLAGS: -I${SRCDIR}/../fdk-aac-lib/objs/include/fdk-aac
+#cgo LDFLAGS: ${SRCDIR}/../fdk-aac-lib/objs/lib/libfdk-aac.a -lm
 #include "aacdecoder_lib.h"
 
 typedef struct {

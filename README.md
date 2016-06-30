@@ -14,8 +14,8 @@ Then, compile the fdk-aac:
 
 ```
 cd $GOPATH/src/github.com/winlinvip/go-fdkaac &&
-git clone https://github.com/winlinvip/fdk-aac.git &&
-cd fdk-aac/ && bash autogen.sh && ./configure --prefix=`pwd`/objs && make && make install &&
+git clone https://github.com/winlinvip/fdk-aac.git fdk-aac-lib &&
+cd fdk-aac-lib/ && bash autogen.sh && ./configure --prefix=`pwd`/objs && make && make install &&
 cd ..
 ```
 
