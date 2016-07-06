@@ -259,7 +259,7 @@ func (v *AacEncoder) Close() {
 }
 
 // Encode the pcm to aac, pcm must contains bytes for one aac frame,
-//		that is the bytes must be 2*channels*frameSize
+//		that is the bytes must be NbBytesPerFrame().
 // @remark fdkaac always use 16bits pcm, so the bits of pcm always 16.
 // @remark user should resample the pcm to fit the encoder, so the channels of pcm equals to encoder's.
 // @remark user should resample the pcm to fit the encoder, so the sampleRate of pcm equals to encoder's.
@@ -320,7 +320,17 @@ func (v *AacEncoder) Flush() (aac []byte, err error) {
 	return aac[0:valid],nil
 }
 
+// Get the channels of encoder.
+func (v *AacEncoder) Channels() int {
+	return v.channels
+}
+
 // Get the frame size of encoder.
 func (v *AacEncoder) FrameSize() int {
 	return int(C.aacenc_frame_size(&v.m))
+}
+
+// Get the number of bytes per a aac frame.
+func (v *AacEncoder) NbBytesPerFrame() int {
+	return 2 * v.channels * v.FrameSize()
 }

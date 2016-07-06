@@ -356,7 +356,7 @@ func (v *AacDecoder) Decode(frame []byte) (pcm []byte, err error) {
 	if nbPcm == 0 {
 		nbPcm = 50 * 1024
 	}
-	pcm = make([]byte, nbPcm, nbPcm)
+	pcm = make([]byte, nbPcm)
 
 	p := (*C.char)(unsafe.Pointer(&pcm[0]))
 	pSize := C.int(nbPcm)
