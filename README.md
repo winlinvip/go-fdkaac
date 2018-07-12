@@ -21,8 +21,8 @@ cd ..
 
 Done, import and use the package:
 
-* [ExampleAacDecoder_RAW](codec/example_test.go), decode the aac frame to PCM samples.
-* [ExampleAacEncoder_LC](codec/example_test.go), encode the PCM samples to aac frame.
+* [ExampleAacDecoder_RAW](fdkaac/example_test.go), decode the aac frame to PCM samples.
+* [ExampleAacEncoder_LC](fdkaac/example_test.go), encode the PCM samples to aac frame.
 * [audio resample](https://github.com/winlinvip/go-aresample).
 
 There are an example of AAC audio packets in ADTS:
