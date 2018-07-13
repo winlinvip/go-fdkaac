@@ -24,7 +24,7 @@ package fdkaac
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../fdk-aac-lib/objs/include/fdk-aac
-#cgo LDFLAGS: ${SRCDIR}/../fdk-aac-lib/objs/lib/libfdk-aac.a -lm
+#cgo LDFLAGS: ${SRCDIR}/../fdk-aac-lib/objs/lib/libfdk-aac.a
 #include "aacdecoder_lib.h"
 
 typedef struct {
@@ -318,8 +318,9 @@ func (v *AacDecoder) InitAdts() (err error) {
 }
 
 // De-allocate all resources of an AAC decoder instance.
-func (v *AacDecoder) Close() {
+func (v *AacDecoder) Close() error {
 	C.aacdec_close(&v.m)
+	return nil
 }
 
 // Fill the buffer of decoder then decode.

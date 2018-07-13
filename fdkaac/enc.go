@@ -254,8 +254,9 @@ func (v *AacEncoder) InitLc(channels, sampleRate, bitrateBps int) (err error) {
 	return
 }
 
-func (v *AacEncoder) Close() {
+func (v *AacEncoder) Close() error {
 	C.aacenc_close(&v.m)
+	return nil
 }
 
 // Encode the pcm to aac, pcm must contains bytes for one aac frame,
