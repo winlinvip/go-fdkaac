@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 )
 
 var f *os.File = nil
@@ -10,7 +10,7 @@ var f *os.File = nil
 func write(data []byte) {
 	if f == nil {
 		var err error
-		f,err = os.Create("adts_data.aac")
+		f, err = os.Create("adts_data.aac")
 		if err != nil {
 			panic(err)
 		}

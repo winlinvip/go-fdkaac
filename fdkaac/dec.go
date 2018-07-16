@@ -307,6 +307,7 @@ func (v *AacDecoder) InitRaw(asc []byte) (err error) {
 // Open the decoder in ADTS mode without ASC,
 // we never know the stream info util got the first frame,
 // because the codec info is insert at begin of each frame.
+// @remark The frame to Decode() is muxed in ADTS format.
 func (v *AacDecoder) InitAdts() (err error) {
 	r := C.aacdec_init_adts(&v.m)
 
@@ -373,7 +374,7 @@ func (v *AacDecoder) Decode(frame []byte) (pcm []byte, err error) {
 		return nil, fmt.Errorf("decode frame failed, code is %d", int(r))
 	}
 
-	return pcm[0:int(validSize)],nil
+	return pcm[0:int(validSize)], nil
 }
 
 // The bits of a sample, the fdk aac always use 16bits sample.

@@ -230,7 +230,7 @@ import (
 
 // The AAC encoder, input is PCM samples, output AAC frame in ADTS.
 type AacEncoder struct {
-	m C.aacenc_t
+	m        C.aacenc_t
 	channels int
 }
 
@@ -295,7 +295,7 @@ func (v *AacEncoder) Encode(pcm []byte) (aac []byte, err error) {
 		return v.Flush()
 	}
 
-	return aac[0:valid],nil
+	return aac[0:valid], nil
 }
 
 // Flush the encoder to get the cached aac frames.
@@ -318,7 +318,7 @@ func (v *AacEncoder) Flush() (aac []byte, err error) {
 		return nil, nil
 	}
 
-	return aac[0:valid],nil
+	return aac[0:valid], nil
 }
 
 // Get the channels of encoder.
