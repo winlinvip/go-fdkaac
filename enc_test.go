@@ -20,10 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // @remark we must use another packet for utest, because the cgo will dup symbols.
-package fdkaac_test
+package fdkaac
 
 import (
-	"github.com/winlinvip/go-fdkaac/fdkaac"
 	"testing"
 )
 
