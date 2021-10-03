@@ -1,4 +1,3 @@
 .idea
-fdk-aac-lib
-doc/adts_data.pcm_s16le.wav
+fdkaac-lib-objs
 
