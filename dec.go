@@ -271,7 +271,9 @@ static int aacdec_num_bad_access_units(aacdec_t* h) {
 import "C"
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"unsafe"
 )
 
@@ -347,10 +349,10 @@ func (v *AacDecoder) fill(input []byte) (err error) {
 // Decode one audio frame.
 // @param the frame contains encoded aac frame, optional can be nil.
 // @eturn when pcm is nil, should fill more bytes and decode again.
-func (v *AacDecoder) Decode(frame []byte) (pcm []byte, err error) {
+func (v *AacDecoder) Decode(frame []byte, dst io.Writer) error {
 	if len(frame) > 0 {
-		if err = v.fill(frame); err != nil {
-			return
+		if err := v.fill(frame); err != nil {
+			return err
 		}
 	}
 
@@ -358,7 +360,7 @@ func (v *AacDecoder) Decode(frame []byte) (pcm []byte, err error) {
 	if nbPcm == 0 {
 		nbPcm = 50 * 1024
 	}
-	pcm = make([]byte, nbPcm)
+	pcm := make([]byte, nbPcm)
 
 	p := (*C.char)(unsafe.Pointer(&pcm[0]))
 	pSize := C.int(nbPcm)
@@ -367,14 +369,15 @@ func (v *AacDecoder) Decode(frame []byte) (pcm []byte, err error) {
 	r := C.aacdec_decode_frame(&v.m, p, pSize, &validSize)
 
 	if int(r) == aacDecNotEnoughBits {
-		return nil, nil
+		return nil
 	}
 
 	if int(r) != 0 {
-		return nil, fmt.Errorf("decode frame failed, code is %d", int(r))
+		return fmt.Errorf("decode frame failed, code is %d", int(r))
 	}
 
-	return pcm[0:int(validSize)], nil
+	io.CopyN(dst, pcm, int64(validSize))
+	return nil
 }
 
 // The bits of a sample, the fdk aac always use 16bits sample.

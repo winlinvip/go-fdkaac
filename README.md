@@ -2,6 +2,8 @@
 
 Golang binding for lib-fdkaac(https://github.com/mstorsjo/fdk-aac)
 
+Only decoders available.
+
 ## Usage
 
 ```
