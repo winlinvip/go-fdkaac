@@ -376,7 +376,7 @@ func (v *AacDecoder) Decode(frame []byte, dst io.Writer) error {
 		return fmt.Errorf("decode frame failed, code is %d", int(r))
 	}
 
-	io.CopyN(dst, pcm, int64(validSize))
+	io.CopyN(dst, bytes.NewBuffer(pcm), int64(validSize))
 	return nil
 }
 

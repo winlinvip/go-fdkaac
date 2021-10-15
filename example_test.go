@@ -28,7 +28,7 @@ import (
 
 func ExampleAacDecoder_RAW() {
 	var err error
-	d := fdkaac.NewAacDecoder()
+	d := NewAacDecoder()
 
 	asc := []byte{0x12, 0x10}
 	if err := d.InitRaw(asc); err != nil {
@@ -94,7 +94,7 @@ func ExampleAacDecoder_RAW() {
 
 func ExampleAacDecoder_ADTS() {
 	var err error
-	d := fdkaac.NewAacDecoder()
+	d := NewAacDecoder()
 
 	if err := d.InitAdts(); err != nil {
 		fmt.Println("init decoder failed, err is", err)
@@ -158,7 +158,7 @@ func ExampleAacDecoder_ADTS() {
 
 func ExampleAacDecoder_ADTS_Stream_NotEnoughBits() {
 	var err error
-	d := fdkaac.NewAacDecoder()
+	d := NewAacDecoder()
 
 	// @remark the partial stream only support by ADTS.
 	if err := d.InitAdts(); err != nil {
@@ -236,7 +236,7 @@ func ExampleAacDecoder_ADTS_Stream_NotEnoughBits() {
 
 func ExampleAacDecoder_ADTS_Frames() {
 	var err error
-	d := fdkaac.NewAacDecoder()
+	d := NewAacDecoder()
 
 	if err := d.InitAdts(); err != nil {
 		fmt.Println("init decoder failed, err is", err)
