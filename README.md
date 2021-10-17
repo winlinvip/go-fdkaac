@@ -6,7 +6,7 @@ Only decoders available.
 
 ## Usage
 ```
-$ git submodule add git@github.com:IzumiSy/go-fdkaac.git lib/go-fdkaac
+$ git submodule add https://github.com/IzumiSy/go-fdkaac.git lib/go-fdkaac
 $ git submodule update --init --recursive
 ```
 
