@@ -36,7 +36,7 @@ $ go get github.com/IzumiSy/go-fdkaac
 ```
 
 ## Tests
-```
+```bash
 $ earthly +test
 
 # or just run go test (fdkaac installation on local required beforehand)
