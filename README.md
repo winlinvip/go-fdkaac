@@ -10,7 +10,18 @@ $ git clone https://github.com/IzumiSy/go-fdkaac
 $ git submodule update --init --recursive
 ```
 
-#### Build and install fdkaac locally
+## Build
+Earthly is required if you don't want to install build tools on your local.
+```bash
+$ earthly +build
+```
+
+### Install (Linux only)
+```bash
+$ sudo earthly +install
+```
+
+### Build manually and install locally
 ```bash
 $ apt install build-essential autoconf libtool
 $ cd fdkaac-lib
@@ -18,15 +29,6 @@ $ ./autogen.sh
 $ ./configure --prefix=/usr
 $ make
 $ make install
-```
-
-#### Build with buildkit and install locally
-```bash
-$ docker build --target artifacts --output type=local,dest=. .
-
-# Manually install files under /usr
-$ sudo cp artifacts/include /usr/include
-$ sudo cp artifacts/lib /usr/lib
 ```
 
 ## Usage

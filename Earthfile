@@ -1,10 +1,22 @@
-VERSION 0.6
+FROM debian:bullseye-slim
+
+RUN apt-get update && apt-get -y install build-essential autoconf libtool
 
 build:
-  FROM DOCKERFILE --target build .
+  GIT CLONE --branch master https://github.com/mstorsjo/fdk-aac.git /fdkaac-lib
+  WORKDIR /fdkaac-lib
+  RUN ./autogen.sh
+  RUN ./configure --prefix=/fdkaac-objs
+  RUN make
+  RUN make install
   SAVE ARTIFACT /fdkaac-objs/include/fdk-aac /fdkaac-include AS LOCAL ./artifact/include
   SAVE ARTIFACT /fdkaac-objs/lib /fdkaac-lib AS LOCAL ./artifact/lib
   SAVE IMAGE --push gcr.io/izumisy/fdkaac:build
+
+install:
+  LOCALLY
+  COPY +build/fdkaac-include /usr/include/fdk-aac
+  COPY +build/fdkaac-lib /usr/lib/fdk-aac
 
 test:
   FROM golang:1.16
