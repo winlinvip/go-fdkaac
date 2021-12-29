@@ -11,7 +11,10 @@ build:
   RUN make install
   SAVE ARTIFACT /fdkaac-objs/include/fdk-aac /fdkaac-include AS LOCAL ./artifact/include
   SAVE ARTIFACT /fdkaac-objs/lib /fdkaac-lib AS LOCAL ./artifact/lib
-  SAVE IMAGE --push ghcr.io/izumisy/fdkaac:build
+
+image:
+  FROM +build
+  SAVE IMAGE --push ghcr.io/izumisy/fdkaac:latest
 
 install:
   LOCALLY
