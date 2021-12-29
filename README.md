@@ -1,5 +1,4 @@
 # go-fdkaac
-
 Golang binding for lib-fdkaac(https://github.com/mstorsjo/fdk-aac)
 
 Only decoders available.
@@ -7,10 +6,9 @@ Only decoders available.
 ## Setup
 ```bash
 $ git clone https://github.com/IzumiSy/go-fdkaac
-$ git submodule update --init --recursive
 ```
 
-## Build
+## Build fdkaac
 Earthly is required if you don't want to install build tools on your local.
 ```bash
 $ earthly +build
