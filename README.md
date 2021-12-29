@@ -36,7 +36,7 @@ $ go get github.com/IzumiSy/go-fdkaac
 ```
 
 Docker image of fdkaac is available for source of multi-stage build.
-```
+```dockerfile
 COPY --from=ghcr.io/izumisy/fdkaac:latest /fdkaac-include /usr/include/fdk-aac
 COPY --from=ghcr.io/izumisy/fdkaac:latest /fdkaac-lib /usr/lib/fdk-aac
 ```
