@@ -13,7 +13,8 @@ build:
   SAVE ARTIFACT /fdkaac-objs/lib /fdkaac-lib AS LOCAL ./artifact/lib
 
 image:
-  FROM +build
+  COPY +build/fdkaac-include /fdkaac-include
+  COPY +build/fdkaac-lib /fdkaac-lib
   SAVE IMAGE --push ghcr.io/izumisy/fdkaac:latest
 
 install:
