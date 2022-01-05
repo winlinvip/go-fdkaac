@@ -6,8 +6,9 @@ Only decoders available.
 ## Usage
 Fdkaac Installation required beforehand.
 ```bash
-$ go get github.com/IzumiSy/go-fdkaac
+$ go get -d github.com/IzumiSy/go-fdkaac
 ```
+`-d` option is almost always required to avoid errors on installation of gcc on your machine.
 
 Docker image of fdkaac is available for source of multi-stage build.
 ```dockerfile
