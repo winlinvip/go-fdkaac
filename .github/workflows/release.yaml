@@ -1,0 +1,33 @@
+name: release
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: Setup earthly
+        run: |
+          wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /tmp/earthly
+          chmod +x /tmp/earthly
+          /tmp/earthly bootstrap
+          /tmp/earthly --version
+
+      - name: Login to GHCR
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        run: /tmp/earthly --push +image
